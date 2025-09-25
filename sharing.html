@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PromptVault Share Redirect</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; color: #1a1a1a; }
+        h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+        p { margin: 0.35rem 0; line-height: 1.5; }
+        a { color: #0057ff; word-break: break-all; }
+        .note { margin-top: 1.5rem; font-size: 0.9rem; color: #555; }
+    </style>
+    <script>
+        function buildDeepLink() {
+            const params = new URLSearchParams(window.location.search);
+            const mode = (params.get('mode') || '').toLowerCase();
+            const id = params.get('id');
+            const data = params.get('data');
+            const sig = params.get('sig');
+
+            if (mode === 'online' || (!mode && id)) {
+                if (id) {
+                    return `promptvault://prompt/id/${encodeURIComponent(id)}`;
+                }
+            }
+
+            if (mode === 'offline' || (!mode && data && sig)) {
+                if (data && sig) {
+                    return `promptvault://prompt/raw/${encodeURIComponent(data)}?sig=${encodeURIComponent(sig)}`;
+                }
+            }
+
+            return '';
+        }
+
+        function init() {
+            const status = document.getElementById('status');
+            const linkElement = document.getElementById('appLink');
+            const deepLink = buildDeepLink();
+
+            if (!deepLink) {
+                status.textContent = 'We could not read the shared prompt link. Please verify the URL or ask the sender to share it again.';
+                return;
+            }
+
+            linkElement.href = deepLink;
+            linkElement.textContent = deepLink;
+            status.textContent = 'Opening PromptVault…';
+
+            // Attempt to navigate via JavaScript. The visible link acts as a manual fallback.
+            window.location.replace(deepLink);
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</head>
+<body>
+    <h1>Redirecting to PromptVault</h1>
+    <p id="status">Preparing link…</p>
+    <p>If nothing happens, tap the link below to open the app manually:</p>
+    <p><a id="appLink" href="#">promptvault://</a></p>
+    <p class="note">Tip: If you do not have the PromptVault app installed, please install it first and then reopen this link.</p>
+</body>
+</html>
