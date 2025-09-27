@@ -15,14 +15,20 @@
         function buildDeepLink() {
             const params = new URLSearchParams(window.location.search);
             const mode = (params.get('mode') || '').toLowerCase();
+            const uid = params.get('uid');
+            const pid = params.get('pid');
             const id = params.get('id');
             const data = params.get('data');
             const sig = params.get('sig');
 
-            if (mode === 'online' || (!mode && id)) {
-                if (id) {
-                    return `promptvault://prompt/id/${encodeURIComponent(id)}`;
+            if (mode === 'online' || (!mode && (uid && pid))) {
+                if (uid && pid) {
+                    return `promptvault://prompt/id/${encodeURIComponent(uid)}/${encodeURIComponent(pid)}`;
                 }
+            }
+
+            if ((mode === 'online' || !mode) && id) {
+                return `promptvault://prompt/id/${encodeURIComponent(id)}`;
             }
 
             if (mode === 'offline' || (!mode && data && sig)) {
